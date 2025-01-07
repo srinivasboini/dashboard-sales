@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -24,10 +25,11 @@ export function Sidebar({ className }: SidebarProps) {
 
   return (
     <div className={cn("pb-12 min-h-screen", className)}>
-      <div className="px-3 py-4">
+      <div className="px-3 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center pl-4">
           <h2 className="text-2xl font-bold">Fiksa</h2>
         </Link>
+        <ThemeToggle />
       </div>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
