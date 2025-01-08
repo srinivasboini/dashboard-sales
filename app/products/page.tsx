@@ -1,23 +1,39 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { useProducts } from "@/hooks/use-data"
 import { DataTable } from "@/components/products/data-table"
 import { columns } from "@/components/products/columns"
-import { Filter, Share, Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import { Loading } from "@/components/ui/loading"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { products } from "./data"
-import { useState } from "react"
-import { Product } from "@/components/products/columns"
+import { Product } from "@/types/database.types"
 
 export default function ProductsPage() {
+  const { products, isLoading, isError } = useProducts()
   const [activeTab, setActiveTab] = useState("all")
-  
-  const filteredProducts = products.filter((product) => {
+
+  if (isLoading) {
+    return <Loading />
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg text-red-500">
+          Error loading products. Please check the console for details.
+        </div>
+      </div>
+    )
+  }
+
+  const filteredProducts = (products || []).filter((product: Product) => {
     switch (activeTab) {
       case "live":
-        return product.status === "Active"
+        return product.status === "active"
       case "archive":
-        return product.status === "Archive"
+        return product.status === "archived"
       case "out-of-stock":
         return product.stock === 0
       case "low-stock":
@@ -33,47 +49,39 @@ export default function ProductsPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Products</h2>
           <p className="text-sm text-muted-foreground">
-            This datatable show all of your product
+            {products?.length || 0} total products
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <Share className="h-4 w-4" />
-          </Button>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Product
-          </Button>
-        </div>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Product
+        </Button>
       </div>
 
-      <Tabs 
-        defaultValue="all" 
-        className="space-y-4"
-        value={activeTab}
-        onValueChange={setActiveTab}
-      >
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="all">
-            All Products ({products.length})
+            All Products ({products?.length || 0})
           </TabsTrigger>
           <TabsTrigger value="live">
-            Live ({products.filter(p => p.status === "Active").length})
+            Live ({products?.filter(p => p.status === "active").length || 0})
           </TabsTrigger>
           <TabsTrigger value="archive">
-            Archive ({products.filter(p => p.status === "Archive").length})
+            Archive ({products?.filter(p => p.status === "archived").length || 0})
           </TabsTrigger>
           <TabsTrigger value="out-of-stock">
-            Out of Stock ({products.filter(p => p.stock === 0).length})
+            Out of Stock ({products?.filter(p => p.stock === 0).length || 0})
           </TabsTrigger>
           <TabsTrigger value="low-stock">
-            Low Stock ({products.filter(p => p.stock > 0 && p.stock <= 5).length})
+            Low Stock ({products?.filter(p => p.stock > 0 && p.stock <= 5).length || 0})
           </TabsTrigger>
         </TabsList>
-        <DataTable columns={columns} data={filteredProducts} />
+
+        <DataTable 
+          columns={columns} 
+          data={filteredProducts} 
+          searchKey="name"
+        />
       </Tabs>
     </div>
   )

@@ -1,8 +1,10 @@
+"use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Customer } from "@/app/customers/data"
+import { Customer } from "@/types/database.types"
 import { Star } from "lucide-react"
 
 interface CustomerCardProps {
@@ -36,11 +38,11 @@ export function CustomerCard({ customer, isExpanded, onClick }: CustomerCardProp
               <div className="flex items-center gap-2">
                 <h3 className="font-medium">{customer.name}</h3>
                 <div className="flex gap-1">
-                  {customer.statuses.map((status) => (
+                  {customer.statuses?.map((status) => (
                     <Badge 
                       key={status} 
                       variant="outline"
-                      className={statusColors[status]}
+                      className={statusColors[status as keyof typeof statusColors]}
                     >
                       {status}
                     </Badge>
@@ -52,9 +54,9 @@ export function CustomerCard({ customer, isExpanded, onClick }: CustomerCardProp
                   <Star className="h-4 w-4 text-yellow-400 mr-1" />
                   {customer.rating}
                 </div>
-                <div>{customer.orders} orders</div>
-                <div>${customer.ltv.toLocaleString()}</div>
-                <div>${customer.lastOrder.amount} {customer.lastOrder.date}</div>
+                <div>{customer.orders_count} orders</div>
+                <div>${customer.total_spent?.toLocaleString()}</div>
+                <div>${customer.last_order_amount} {customer.last_order_date}</div>
                 <div>{customer.phone}</div>
               </div>
             </div>
@@ -64,20 +66,12 @@ export function CustomerCard({ customer, isExpanded, onClick }: CustomerCardProp
           </Button>
         </div>
 
-        {isExpanded && (
+        {isExpanded && customer.notes && (
           <div className="mt-6">
             <div className="space-y-4">
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground">Notes</h4>
                 <p className="mt-1">{customer.notes}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Favorite Items</h4>
-                <div className="mt-2 flex gap-2">
-                  {customer.favoriteItems?.map((item, index) => (
-                    <div key={index} className="h-12 w-12 rounded-md bg-muted" />
-                  ))}
-                </div>
               </div>
             </div>
           </div>

@@ -3,13 +3,31 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/products/data-table"
-import { columns, Order } from "@/components/orders/columns"
+import { columns } from "@/components/orders/columns"
 import { Filter, Share, Plus } from "lucide-react"
 import { OrderDetails } from "@/components/orders/order-details"
-import { orders } from "./data" // Import from data file
+import { useOrders } from "@/hooks/use-data"
+import { Order } from "@/types/database.types"
 
 export default function OrdersPage() {
+  const { orders, isLoading, isError } = useOrders()
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Loading orders...</div>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg text-red-500">Error loading orders</div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-screen">
@@ -18,7 +36,7 @@ export default function OrdersPage() {
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Orders</h2>
             <p className="text-sm text-muted-foreground">
-              Your order details
+              Manage your orders
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -37,9 +55,9 @@ export default function OrdersPage() {
 
         <DataTable 
           columns={columns} 
-          data={orders}
+          data={orders || []}
           onRowClick={(order) => setSelectedOrder(order)}
-          searchKey="shippedTo" // Search by customer name
+          searchKey="id"
         />
       </div>
 

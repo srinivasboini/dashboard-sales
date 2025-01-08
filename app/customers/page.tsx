@@ -11,20 +11,41 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { CustomerCard } from "@/components/customers/customer-card"
-import { customers } from "./data"
+import { useCustomers } from '@/hooks/use-data'
 import { Plus, Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { Customer } from "@/types/database.types"
+import { Loading } from "@/components/ui/loading"
 
-const ITEMS_PER_PAGE = 5 // Show 5 customers per page
+const ITEMS_PER_PAGE = 5
 
 export default function CustomersPage() {
+  const { customers, isLoading, isError } = useCustomers()
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [filter, setFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
 
-  const filteredCustomers = customers.filter(customer => {
+  if (isLoading) {
+    return <Loading />
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg text-red-500">
+          Error loading customers. Please check the console for details.
+        </div>
+      </div>
+    )
+  }
+
+  if (!customers) {
+    return null
+  }
+
+  const filteredCustomers = customers.filter((customer: Customer) => {
     const matchesSearch = customer.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesFilter = filter === "all" || customer.statuses.includes(filter as any)
+    const matchesFilter = filter === "all" || (customer.statuses && customer.statuses.includes(filter))
     return matchesSearch && matchesFilter
   })
 
@@ -34,9 +55,9 @@ export default function CustomersPage() {
 
   const stats = {
     total: customers.length,
-    newToday: customers.filter(c => c.statuses.includes("new")).length,
-    returning: customers.filter(c => c.statuses.includes("returning")).length,
-    online: 34
+    newToday: customers.filter((c: Customer) => c.statuses?.includes("new")).length,
+    returning: customers.filter((c: Customer) => c.statuses?.includes("returning")).length,
+    online: customers.filter((c: Customer) => c.statuses?.includes("active")).length
   }
 
   return (

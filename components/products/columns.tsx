@@ -1,37 +1,14 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import { Product } from "@/types/database.types"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import Image from "next/image"
-import { Table } from "@tanstack/react-table"
-
-export type Product = {
-  id: string
-  rank: number
-  image: string
-  name: string
-  totalBuyers: number
-  price: number
-  stock: number
-  rating: {
-    score: number
-    status: 'Perfect' | 'Very Good' | 'Good' | 'Bad'
-  }
-  status: 'Active' | 'Archive'
-}
-
-type RatingColors = {
-  Perfect: string
-  "Very Good": string
-  Good: string
-  Bad: string
-}
 
 export const columns: ColumnDef<Product>[] = [
   {
     id: "select",
-    header: ({ table }: { table: Table<Product> }) => (
+    header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
@@ -49,77 +26,64 @@ export const columns: ColumnDef<Product>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "rank",
-    header: "Rank",
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.getValue("id")}</span>
   },
   {
     accessorKey: "name",
-    header: "Product",
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 relative">
-            <Image
-              src={row.original.image}
-              alt={row.original.name}
-              fill
-              className="object-cover rounded-md"
-            />
-          </div>
-          <div>
-            <div className="font-medium">{row.original.name}</div>
-            <div className="text-sm text-muted-foreground">ID: {row.original.id}</div>
-          </div>
-        </div>
-      )
-    }
+    header: "Name",
   },
   {
-    accessorKey: "totalBuyers",
-    header: "Total Buyers",
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {row.getValue("description") || "—"}
+      </span>
+    )
   },
   {
     accessorKey: "price",
     header: "Price",
     cell: ({ row }) => {
-      return <div>${row.original.price.toLocaleString()}</div>
-    }
+      const price = parseFloat(row.getValue("price"))
+      const formatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(price)
+      return formatted
+    },
   },
   {
     accessorKey: "stock",
     header: "Stock",
-  },
-  {
-    accessorKey: "rating",
-    header: "Rating",
     cell: ({ row }) => {
-      const rating = row.original.rating
-      const colors = {
-        Perfect: "bg-green-100 text-green-800",
-        "Very Good": "bg-blue-100 text-blue-800",
-        Good: "bg-yellow-100 text-yellow-800",
-        Bad: "bg-red-100 text-red-800",
-      }
+      const stock = row.getValue("stock") as number
       return (
-        <div className="flex items-center gap-2">
-          <div className="text-sm text-muted-foreground">Score: {rating.score}</div>
-          <Badge variant="outline" className={colors[rating.status]}>
-            {rating.status}
-          </Badge>
-        </div>
+        <span className={stock === 0 ? "text-red-500" : ""}>
+          {stock}
+        </span>
       )
     }
+  },
+  {
+    accessorKey: "category",
+    header: "Category",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.getValue("category")}</span>
+    )
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.original.status
+      const status = row.getValue("status") as string
       return (
-        <Badge variant={status === 'Active' ? 'default' : 'secondary'}>
+        <Badge variant={status === 'active' ? 'default' : 'secondary'}>
           {status}
         </Badge>
       )
     }
-  },
+  }
 ] 

@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Sidebar } from '@/components/sidebar'
 import { ThemeProvider } from '@/components/theme-provider'
+import { SWRProvider } from '@/components/providers/swr-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,22 +20,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="flex min-h-screen">
-            {/* Sidebar */}
-            <div className="w-64 border-r bg-background">
-              <Sidebar />
+        <ThemeProvider>
+          <SWRProvider>
+            <div className="flex min-h-screen">
+              <div className="w-64 border-r bg-background">
+                <Sidebar />
+              </div>
+              <main className="flex-1">
+                {children}
+              </main>
             </div>
-            {/* Main Content */}
-            <main className="flex-1">
-              {children}
-            </main>
-          </div>
+          </SWRProvider>
         </ThemeProvider>
       </body>
     </html>

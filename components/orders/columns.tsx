@@ -1,75 +1,38 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Table } from "@tanstack/react-table"
-
-export type Order = {
-  id: string
-  shippedTo: string
-  orderDate: string
-  shippedDate: string
-  address: string
-  city: string
-  state: string
-  zip: string
-  shippingMethod: string
-}
+import { Order } from "@/types/database.types"
 
 export const columns: ColumnDef<Order>[] = [
   {
-    id: "select",
-    header: ({ table }: { table: Table<Order> }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     accessorKey: "id",
-    header: "Order #",
+    header: "Order ID",
   },
   {
-    accessorKey: "shippedTo",
-    header: "Shipped to",
+    accessorKey: "customer.name",
+    header: "Customer",
   },
   {
-    accessorKey: "orderDate",
-    header: "Order date",
+    accessorKey: "total_amount",
+    header: "Amount",
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("total_amount"))
+      return `$${amount.toFixed(2)}`
+    },
   },
   {
-    accessorKey: "shippedDate",
-    header: "Shipped date",
+    accessorKey: "status",
+    header: "Status",
   },
   {
-    accessorKey: "address",
-    header: "Address",
+    accessorKey: "shipping_method",
+    header: "Shipping",
   },
   {
-    accessorKey: "city",
-    header: "City",
-  },
-  {
-    accessorKey: "state",
-    header: "State",
-  },
-  {
-    accessorKey: "zip",
-    header: "Zip",
-  },
-  {
-    accessorKey: "shippingMethod",
-    header: "Shipping method",
-  },
+    accessorKey: "created_at",
+    header: "Date",
+    cell: ({ row }) => {
+      return new Date(row.getValue("created_at")).toLocaleDateString()
+    },
+  }
 ] 
