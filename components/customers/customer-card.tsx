@@ -54,9 +54,8 @@ export function CustomerCard({ customer, isExpanded, onClick }: CustomerCardProp
                   <Star className="h-4 w-4 text-yellow-400 mr-1" />
                   {customer.rating}
                 </div>
-                <div>{customer.orders_count} orders</div>
-                <div>${customer.total_spent?.toLocaleString()}</div>
-                <div>${customer.last_order_amount} {customer.last_order_date}</div>
+                <div>{customer.orders} orders</div>
+                <div>${customer.ltv.toLocaleString()}</div>
                 <div>{customer.phone}</div>
               </div>
             </div>
