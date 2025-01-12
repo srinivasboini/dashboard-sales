@@ -9,11 +9,11 @@ import { Star } from "lucide-react"
 
 interface CustomerCardProps {
   customer: Customer
-  isExpanded?: boolean
+  isSelected?: boolean
   onClick?: () => void
 }
 
-export function CustomerCard({ customer, isExpanded, onClick }: CustomerCardProps) {
+export function CustomerCard({ customer, isSelected, onClick }: CustomerCardProps) {
   const statusColors = {
     returning: "bg-yellow-100 text-yellow-800",
     vip: "bg-pink-100 text-pink-800",
@@ -24,8 +24,9 @@ export function CustomerCard({ customer, isExpanded, onClick }: CustomerCardProp
 
   return (
     <Card 
-      className={`cursor-pointer hover:shadow-md transition-shadow ${isExpanded ? 'border-primary' : ''}`}
+      className={`cursor-pointer hover:shadow-md transition-shadow ${isSelected ? 'border-primary' : ''}`}
       onClick={onClick}
+      style={{ border: isSelected ? '2px solid var(--primary)' : 'none' }}
     >
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
@@ -65,7 +66,7 @@ export function CustomerCard({ customer, isExpanded, onClick }: CustomerCardProp
           </Button>
         </div>
 
-        {isExpanded && customer.notes && (
+        {customer.notes && (
           <div className="mt-6">
             <div className="space-y-4">
               <div>
